@@ -17,15 +17,29 @@ const {
 const { error } = require("console");
 const sendToShipmentStateMicroService = require("../fuctions/sendToshipmentStateMicroservice");
 const { json } = require("stream/consumers");
-const { getConnection } = require("../dbconfig");
+const { getConnection, executeQuery } = require("../dbconfig");
 
 async function AltaEnvio(company, data) {
+  // console.log("AltaEnvio", data, company);
+
   const connection = await getConnection(company.did);
   try {
+    querycheck =
+      "SELECT ml_vendedor_id, ml_shipment_id FROM envios WHERE ml_vendedor_id = ? AND ml_shipment_id = ? AND elim = 0 and superado = 0";
+    const result = await executeQuery(connection, querycheck, [
+      data.data.ml_vendedor_id,
+      data.data.ml_shipment_id,
+    ]);
+    if (result.length > 0) {
+      return {
+        status: 400,
+        message: "El envio ya existe",
+      };
+    }
     try {
       let insertId;
 
-      if (data.data.flex === 1) {
+      if (data.data.flex === 1 && data.data.mlIa == 0) {
         const envioflex = new EnviosFlex(
           data.data.did,
           data.data.ml_shipment_id,
@@ -90,8 +104,10 @@ async function AltaEnvio(company, data) {
         const envio = new Envios(data.data, company, connection);
         const resultado = await envio.insert();
         insertId = resultado.did;
-        console.log(envio, "envio");
-        console.log(data.data, "data");
+        console.log(resultado, "resultado envio");
+
+        //     console.log(envio, "envio");
+        //  console.log(data.data, "data");
 
         logGreen(`Registro insertado con did: ${insertId}`);
 
@@ -208,15 +224,8 @@ async function AltaEnvio(company, data) {
             company,
             connection
           );
-          await enviosItems.insert(); // Asegúrate de que `insert()` esté definido en EnviosItems
+          const insertIdItems = await enviosItems.insert(); // Asegúrate de que `insert()` esté definido en EnviosItems
         }
-        console.log(
-          company.did,
-          data.data.quien,
-          insertId,
-          data.data.estado,
-          "Info"
-        );
 
         let respuesta = await sendToShipmentStateMicroService(
           company.did,
@@ -236,6 +245,8 @@ async function AltaEnvio(company, data) {
   } catch (error) {
     console.error("Error en la función principal:", error);
     return false;
+  } finally {
+    connection.end(); // Liberar la conexión
   }
 }
 
