@@ -25,7 +25,7 @@ async function startConsumer() {
           const empresasExcluidas = [149, 44, 86, 36]; // IDs a ignorar
 
           if (empresasExcluidas.includes(idEmpresa)) {
-            console.log(`Mensaje con idEmpresa ${idEmpresa} ignorado.`);
+            //  console.log(`Mensaje con idEmpresa ${idEmpresa} ignorado.`);
             return channel.ack(msg);
           }
 
@@ -33,7 +33,7 @@ async function startConsumer() {
             const connectionDb = await getConnection(idEmpresa);
             const company = await getCompanyById(idEmpresa);
             console.log(data);
-            console.log(company, "company");
+            // console.log(company, "company");
 
             await AltaEnvio(company, data);
 
