@@ -23,18 +23,37 @@ async function AltaEnvio(company, data) {
   // console.log("AltaEnvio", data, company);
 
   const connection = await getConnection(company.did);
+
   try {
-    querycheck =
-      "SELECT ml_vendedor_id, ml_shipment_id FROM envios WHERE ml_vendedor_id = ? AND ml_shipment_id = ? AND elim = 0 and superado = 0";
-    const result = await executeQuery(connection, querycheck, [
-      data.data.ml_vendedor_id,
-      data.data.ml_shipment_id,
-    ]);
-    if (result.length > 0) {
-      return {
-        status: 400,
-        message: "El envio ya existe",
-      };
+    if (data.operador === "enviosMLIA ") {
+      if (data.operador.ia == 1) {
+        const querycheck =
+          "SELECT ml_vendedor_id, ml_shipment_id FROM envios WHERE ml_vendedor_id = ? AND ml_shipment_id = ? AND elim = 0 and superado = 0";
+        const result = await executeQuery(connection, querycheck, [
+          data.data.ml_vendedor_id,
+          data.data.ml_shipment_id,
+        ]);
+        if (result.length > 0) {
+          return {
+            status: 400,
+            message: "El envio ya existe",
+          };
+        }
+      }
+      if (data.operador.ff == 1) {
+        const querycheck =
+          "SELECT ml_vendedor_id, ml_shipment_id FROM envios WHERE ml_vendedor_id = ? AND ml_shipment_id = ? AND elim = 0 and superado = 0";
+        const result = await executeQuery(connection, querycheck, [
+          data.data.ml_vendedor_id,
+          data.data.ml_shipment_id,
+        ]);
+        if (result.length > 0) {
+          return {
+            status: 400,
+            message: "El envio ya existe",
+          };
+        }
+      }
     }
     try {
       let insertId;
@@ -74,7 +93,7 @@ async function AltaEnvio(company, data) {
           data.data.destination_receiver_email = email;
         }
         // Solo insertar en ordenes si fulfillment es 0
-        if (data.data.fullfillment === 1) {
+        if (data.data.ff === 1) {
           const orden = new Ordenes({
             did: data.data.did || 0,
             didEnvio: insertId,
@@ -97,7 +116,7 @@ async function AltaEnvio(company, data) {
         }
 
         // Establecer elim en 52 si fulfillment es 0
-        if (data.data.fullfillment === 1) {
+        if (data.data.ff === 1) {
           data.data.elim = 52; // Modificar el campo elim
         }
 
