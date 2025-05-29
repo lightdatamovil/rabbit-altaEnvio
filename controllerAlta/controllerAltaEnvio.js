@@ -25,8 +25,8 @@ async function AltaEnvio(company, data) {
   const connection = await getConnection(company.did);
 
   try {
-    if (data.operador === "enviosMLIA ") {
-      if (data.operador.ia == 1) {
+    if (data.data.operador == "enviosMLIA") {
+      if (data.data.ia == 1) {
         const querycheck =
           "SELECT ml_vendedor_id, ml_shipment_id FROM envios WHERE ml_vendedor_id = ? AND ml_shipment_id = ? AND elim = 0 and superado = 0";
         const result = await executeQuery(connection, querycheck, [
@@ -34,13 +34,14 @@ async function AltaEnvio(company, data) {
           data.data.ml_shipment_id,
         ]);
         if (result.length > 0) {
+          console.log("El envio ya existe", result);
           return {
             status: 400,
             message: "El envio ya existe",
           };
         }
       }
-      if (data.operador.ff == 1) {
+      if (data.data.ff == 1) {
         const querycheck =
           "SELECT ml_vendedor_id, ml_shipment_id FROM envios WHERE ml_vendedor_id = ? AND ml_shipment_id = ? AND elim = 0 and superado = 0";
         const result = await executeQuery(connection, querycheck, [
@@ -48,6 +49,8 @@ async function AltaEnvio(company, data) {
           data.data.ml_shipment_id,
         ]);
         if (result.length > 0) {
+          console.log("El envio ya existe", result);
+
           return {
             status: 400,
             message: "El envio ya existe",
