@@ -1,5 +1,5 @@
-const { getConnection, getFromRedis } = require('../../dbconfig');
-const { logYellow, logBlue } = require('../../fuctions/logsCustom');
+const { getConnection, getFromRedis } = require("../../dbconfig");
+const { logYellow, logBlue } = require("../../fuctions/logsCustom");
 
 // Clase Ordenes
 class Ordenes {
@@ -16,7 +16,7 @@ class Ordenes {
     descargado = 0,
     fecha_armado = null,
     quien_armado = "",
-    idEmpresa = null
+    idEmpresa = null,
   } = {}) {
     this.did = did;
     this.didEnvio = didEnvio;
@@ -34,13 +34,28 @@ class Ordenes {
   }
 
   // Método para convertir a JSON
+  // Método para convertir a JSON
   toJSON() {
-    return JSON.stringify(this);
+    return {
+      did: this.did,
+      didEnvio: this.didEnvio,
+      didCliente: this.didCliente,
+      didCuenta: this.didCuenta,
+      status: this.status,
+      flex: this.flex,
+      number: this.number,
+      observaciones: this.observaciones,
+      armado: this.armado,
+      descargado: this.descargado,
+      fecha_armado: this.fecha_armado,
+      quien_armado: this.quien_armado,
+      idEmpresa: this.idEmpresa,
+    };
   }
 
   // Método para insertar en la base de datos
   async insert() {
-    const redisKey = 'empresasData';
+    const redisKey = "empresasData";
     console.log("Buscando clave de Redis:", redisKey);
 
     try {
@@ -50,7 +65,9 @@ class Ordenes {
       const empresa = empresasDB ? empresasDB[this.idEmpresa] : null;
 
       if (!empresa) {
-        throw new Error(`Configuración no encontrada en Redis para empresa con ID: ${this.idEmpresa}`);
+        throw new Error(
+          `Configuración no encontrada en Redis para empresa con ID: ${this.idEmpresa}`
+        );
       }
 
       console.log("Configuración de la empresa encontrada:", empresa);
@@ -76,7 +93,7 @@ class Ordenes {
 
   // Verificar y actualizar el 'did'
   checkAndUpdateDid(connection) {
-    const checkDidQuery = 'SELECT id FROM ordenes WHERE did = ?';
+    const checkDidQuery = "SELECT id FROM ordenes WHERE did = ?";
     return new Promise((resolve, reject) => {
       connection.query(checkDidQuery, [this.did], (err, results) => {
         if (err) {
@@ -84,7 +101,7 @@ class Ordenes {
         }
 
         if (results.length > 0) {
-          const updateQuery = 'UPDATE ordenes SET superado = 1 WHERE did = ?';
+          const updateQuery = "UPDATE ordenes SET superado = 1 WHERE did = ?";
           connection.query(updateQuery, [this.did], (updateErr) => {
             if (updateErr) {
               return reject(updateErr);
@@ -100,7 +117,7 @@ class Ordenes {
 
   // Crear un nuevo registro en la tabla 'ordenes'
   createNewRecord(connection) {
-    const columnsQuery = 'DESCRIBE ordenes';
+    const columnsQuery = "DESCRIBE ordenes";
 
     return new Promise((resolve, reject) => {
       connection.query(columnsQuery, (err, results) => {
@@ -109,21 +126,27 @@ class Ordenes {
         }
 
         const tableColumns = results.map((column) => column.Field);
-        const filteredColumns = tableColumns.filter((column) => this[column] !== undefined);
+        const filteredColumns = tableColumns.filter(
+          (column) => this[column] !== undefined
+        );
         const values = filteredColumns.map((column) => this[column]);
-        const insertQuery = `INSERT INTO ordenes (${filteredColumns.join(', ')}) VALUES (${filteredColumns.map(() => '?').join(', ')})`;
+        const insertQuery = `INSERT INTO ordenes (${filteredColumns.join(
+          ", "
+        )}) VALUES (${filteredColumns.map(() => "?").join(", ")})`;
 
-        logYellow(`Insert Query: ${JSON.stringify(insertQuery)}`)
-        logBlue(`Values: ${JSON.stringify(values)}`)
+        logYellow(`Insert Query: ${JSON.stringify(insertQuery)}`);
+        logBlue(`Values: ${JSON.stringify(values)}`);
         connection.query(insertQuery, values, (err, results) => {
           if (err) {
             return reject(err);
           }
 
           const insertId = results.insertId; // Guardamos el ID de la orden insertada
-          this.insertItems(connection, insertId).then(() => {
-            resolve({ insertId });
-          }).catch(reject);
+          this.insertItems(connection, insertId)
+            .then(() => {
+              resolve({ insertId });
+            })
+            .catch(reject);
         });
       });
     });
@@ -134,22 +157,22 @@ class Ordenes {
     // Aquí puedes definir los items que deseas insertar. Por ejemplo:
     const items = [
       {
-        codigo: 'ITEM001',
-        imagen: 'imagen1.png',
-        descripcion: 'Descripción del item 1',
-        ml_id: 'ML001',
-        dimensions: '10x10x10',
+        codigo: "ITEM001",
+        imagen: "imagen1.png",
+        descripcion: "Descripción del item 1",
+        ml_id: "ML001",
+        dimensions: "10x10x10",
         cantidad: 5,
-        variacion: 'Color: Rojo',
-        seller_sku: 'SKU001',
+        variacion: "Color: Rojo",
+        seller_sku: "SKU001",
         descargado: 0,
         superado: 0,
-        elim: 0
+        elim: 0,
       },
       // Agrega más items según sea necesario
     ];
 
-    const insertPromises = items.map(item => {
+    const insertPromises = items.map((item) => {
       const insertQuery = `INSERT INTO ordenes_items (didOrden, codigo, imagen, descripcion, ml_id, dimensions, cantidad, variacion, seller_sku, descargado, superado, elim) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
       const values = [
         didOrden,
@@ -163,7 +186,7 @@ class Ordenes {
         item.seller_sku,
         item.descargado,
         item.superado,
-        item.elim
+        item.elim,
       ];
 
       return new Promise((resolve, reject) => {
