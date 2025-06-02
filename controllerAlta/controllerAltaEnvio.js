@@ -43,10 +43,10 @@ async function AltaEnvio(company, data) {
       }
       if (data.data.ff == 1) {
         const querycheck =
-          "SELECT ml_vendedor_id, ml_shipment_id FROM envios WHERE ml_vendedor_id = ? AND ml_shipment_id = ? AND elim = 0 and superado = 0";
+          "SELECT ml_vendedor_id, ml_shipment_id FROM envios WHERE ml_venta_id = ? AND ml_pack_id = ? AND elim = 0 and superado = 0";
         const result = await executeQuery(connection, querycheck, [
-          data.data.ml_vendedor_id,
-          data.data.ml_shipment_id,
+          data.data.ml_venta_id,
+          data.data.ml_pack_id,
         ]);
         if (result.length > 0) {
           console.log("El envio ya existe", result);
@@ -102,14 +102,15 @@ async function AltaEnvio(company, data) {
             didEnvio: insertId,
             didCliente: data.data.didCliente,
             didCuenta: data.data.didCuenta,
-            status: "Pendiente",
+            status: data.data.status_order || "no ingreso",
             flex: data.data.flex,
-            number: `ORD-${new Date().getTime()}`,
-            observaciones: data.data.observaciones || "",
+            fecha_venta: data.data.fecha_venta || "",
+            orden: data.data.ml_venta_id || "",
+            observaciones: data.data.enviosObservaciones.observacion || "",
             armado: 0,
             descargado: 0,
             fecha_armado: null,
-            quien_armado: "2",
+            quien_armado: "0",
             idEmpresa: company.did,
             connection: connection,
           });
