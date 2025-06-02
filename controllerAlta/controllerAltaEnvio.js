@@ -254,7 +254,7 @@ async function AltaEnvio(company, data) {
           company.did,
           data.data.quien,
           insertId,
-          data.data.estado
+          data.data.estado ?? 7
         );
         console.log(respuesta, "respuesta");
 
