@@ -11,7 +11,10 @@ class Envios {
     fecha.setHours(fecha.getHours() - 3);
     this.fecha_inicio = fecha.toISOString();
 */
-    // Lista de campos a evaluar
+    const fecha = new Date();
+    fecha.setHours(fecha.getHours()); // Ajustar la hora según sea necesario
+    data.fecha_inicio = fecha.toISOString(); // Asignar la fecha en formato ISO
+
     const campos = {
       did: data.did ?? 0,
       didDeposito: data.didDeposito ?? 1,
@@ -29,7 +32,8 @@ class Envios {
       didServicio: data.didServicio ?? 1,
       didSucursalDistribucion: data.didSucursalDistribucion ?? 1,
       peso: data.peso ?? "",
-      fecha_inicio: data.fecha_inicio,
+      fecha_inicio: fecha,
+
       volumen: data.volumen ?? "",
       bultos: data.bultos ?? 1,
       valor_declarado: data.valor_declarado ?? "",
@@ -55,6 +59,12 @@ class Envios {
 
     this.company = company;
     this.connection = connection;
+  }
+
+  get fecha_inicio() {
+    const fecha = new Date();
+    fecha.setHours(fecha.getHours() - 3); // Ajustar la hora según sea necesario
+    return fecha.toISOString();
   }
 
   generateGToken() {
