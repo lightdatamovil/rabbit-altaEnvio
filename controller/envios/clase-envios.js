@@ -7,10 +7,10 @@ class Envios {
     this.fechaunix = this.generateFechaUnix();
 
     // Fecha de inicio ajustada
-    let fecha = data.fecha_inicio ? new Date(data.fecha_inicio) : new Date();
+    /* let fecha = data.fecha_inicio ? new Date(data.fecha_inicio) : new Date();
     fecha.setHours(fecha.getHours() - 3);
     this.fecha_inicio = fecha.toISOString();
-
+*/
     // Lista de campos a evaluar
     const campos = {
       did: data.did ?? 0,
@@ -29,6 +29,7 @@ class Envios {
       didServicio: data.didServicio ?? 1,
       didSucursalDistribucion: data.didSucursalDistribucion ?? 1,
       peso: data.peso ?? "",
+      fecha_inicio: data.fecha_inicio,
       volumen: data.volumen ?? "",
       bultos: data.bultos ?? 1,
       valor_declarado: data.valor_declarado ?? "",
