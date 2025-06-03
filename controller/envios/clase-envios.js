@@ -53,11 +53,6 @@ class Envios {
   }
 
   // Getter para fecha_inicio
-  get fecha_inicio() {
-    const fecha = new Date();
-    fecha.setHours(fecha.getHours() - 3); // Ajustar la hora según sea necesario
-    return fecha.toISOString(); // Devuelve la fecha ajustada
-  }
 
   generateGToken() {
     return Math.random().toString(36).substring(2);
