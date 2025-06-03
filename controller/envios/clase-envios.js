@@ -1,19 +1,12 @@
-const { getConnection, getFromRedis, executeQuery } = require("../../dbconfig");
-const { logYellow, logBlue } = require("../../fuctions/logsCustom");
-
 class Envios {
   constructor(data, company = null, connection = null) {
     this.gtoken = this.generateGToken();
     this.fechaunix = this.generateFechaUnix();
 
     // Fecha de inicio ajustada
-    /* let fecha = data.fecha_inicio ? new Date(data.fecha_inicio) : new Date();
-    fecha.setHours(fecha.getHours() - 3);
-    this.fecha_inicio = fecha.toISOString();
-*/
     const fecha = new Date();
-    fecha.setHours(fecha.getHours()); // Ajustar la hora según sea necesario
-    data.fecha_inicio = fecha.toISOString(); // Asignar la fecha en formato ISO
+    fecha.setHours(fecha.getHours() - 3); // Ajustar la hora según sea necesario
+    this.fecha_inicio = fecha.toISOString(); // Asignar la fecha en formato ISO
 
     const campos = {
       did: data.did ?? 0,
@@ -32,8 +25,6 @@ class Envios {
       didServicio: data.didServicio ?? 1,
       didSucursalDistribucion: data.didSucursalDistribucion ?? 1,
       peso: data.peso ?? "",
-      fecha_inicio: fecha,
-
       volumen: data.volumen ?? "",
       bultos: data.bultos ?? 1,
       valor_declarado: data.valor_declarado ?? "",
@@ -61,10 +52,11 @@ class Envios {
     this.connection = connection;
   }
 
+  // Getter para fecha_inicio
   get fecha_inicio() {
     const fecha = new Date();
     fecha.setHours(fecha.getHours() - 3); // Ajustar la hora según sea necesario
-    return fecha.toISOString();
+    return fecha.toISOString(); // Devuelve la fecha ajustada
   }
 
   generateGToken() {
@@ -74,7 +66,6 @@ class Envios {
   generateFechaUnix() {
     return Math.floor(Date.now() / 1000);
   }
-
   async insert() {
     try {
       // Establecer elim en 52 si es necesario
