@@ -1,3 +1,6 @@
+const { getConnection, getFromRedis, executeQuery } = require("../../dbconfig");
+const { logYellow, logBlue } = require("../../fuctions/logsCustom");
+
 class Envios {
   constructor(data, company = null, connection = null) {
     this.gtoken = this.generateGToken();
@@ -61,6 +64,7 @@ class Envios {
   generateFechaUnix() {
     return Math.floor(Date.now() / 1000);
   }
+
   async insert() {
     try {
       // Establecer elim en 52 si es necesario
