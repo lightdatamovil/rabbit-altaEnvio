@@ -29,7 +29,7 @@ async function startConsumer() {
             return channel.ack(msg);
           }
 
-          if (idEmpresa === 159 || idEmpresa === 214 || idEmpresa === 274 || idEmpresa === 108) {
+          if (idEmpresa === 159 || idEmpresa === 214 || idEmpresa === 274 || idEmpresa === 108 || idEmpresa === 268 || idEmpresa === 201 || idEmpresa === 237 ) {
             const connectionDb = await getConnection(idEmpresa);
             const company = await getCompanyById(idEmpresa);
             console.log(data);
