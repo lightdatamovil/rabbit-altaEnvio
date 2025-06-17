@@ -165,7 +165,7 @@ async function AltaEnvio(company, data) {
         if (data.data.enviosObservaciones) {
           const observacionDefault =
             data.data.enviosObservaciones.observacion ||
-            "efectivamente la observacion default de light data";
+            "";
           const observaciones = new EnviosObservaciones(
             insertId,
             observacionDefault,
@@ -185,7 +185,7 @@ async function AltaEnvio(company, data) {
             data.data.enviosDireccionesDestino.calle,
             data.data.enviosDireccionesDestino.numero,
             data.data.enviosDireccionesDestino.address_line ||
-              `${data.data.enviosDireccionesDestino.calle} ${data.data.enviosDireccionesDestino.numero}`,
+            `${data.data.enviosDireccionesDestino.calle} ${data.data.enviosDireccionesDestino.numero}`,
             data.data.enviosDireccionesDestino.cp,
             data.data.enviosDireccionesDestino.ciudad,
             data.data.enviosDireccionesDestino.localidad,
@@ -212,7 +212,7 @@ async function AltaEnvio(company, data) {
             data.data.enviosDireccionesRemitente.calle,
             data.data.enviosDireccionesRemitente.numero,
             data.data.enviosDireccionesRemitente.calle +
-              data.data.enviosDireccionesRemitente.numero,
+            data.data.enviosDireccionesRemitente.numero,
             data.data.enviosDireccionesRemitente.cp,
             data.data.enviosDireccionesRemitente.localidad,
             data.data.enviosDireccionesRemitente.provincia,
@@ -220,7 +220,7 @@ async function AltaEnvio(company, data) {
             data.data.enviosDireccionesRemitente.latitud,
             data.data.enviosDireccionesRemitente.longitud,
             data.data.enviosDireccionesRemitente.obs ||
-              "observaciones light data",
+            "observaciones light data",
             data.data.enviosDireccionesRemitente.quien,
             company,
             connection
