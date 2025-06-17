@@ -39,7 +39,7 @@ class Envios {
       destination_receiver_phone: data.destination_receiver_phone,
       destination_receiver_email: data.destination_receiver_email,
       destination_comments: data.destination_comments ?? "   ",
-      destination_types: data.destination_types ?? " ",
+      destination_type: data.destination_types ?? " ",
 
 
       delivery_preference: data.delivery_preference ?? " ",
