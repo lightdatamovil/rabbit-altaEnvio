@@ -22,22 +22,22 @@ async function startConsumer() {
           const data = JSON.parse(msg.content.toString());
           const idEmpresa = data.data.didEmpresa;
 
-          const empresasExcluidas = [149, 44, 86, 36]; // IDs a ignorar
+          const empresasIgnoradas = new Set([149, 44, 86, 36]);
+          const empresasPermitidas = new Set([159, 214, 274, 108, 268, 201, 237, 61, 106, 198, 247, 287]);
 
-          if (empresasExcluidas.includes(idEmpresa)) {
+
+          if (empresasIgnoradas.has(idEmpresa)) {
             console.log(`Mensaje con idEmpresa ${idEmpresa} ignorado.`);
             return channel.ack(msg);
           }
 
-          if (idEmpresa === 159 || idEmpresa === 214 || idEmpresa === 274 || idEmpresa === 108 || idEmpresa === 268 || idEmpresa === 201 || idEmpresa === 237 || idEmpresa === 61 || idEmpresa === 106
-            || idEmpresa === 198 || idEmpresa === 247 || idEmpresa === 287
-          ) {
-            const connectionDb = await getConnection(idEmpresa);
+          if (empresasPermitidas.has(idEmpresa)) {
+            //  const connectionDb = await getConnection(idEmpresa);
             const company = await getCompanyById(idEmpresa);
             console.log(data);
-            // console.log(company, "company");
 
             await AltaEnvio(company, data);
+
 
             channel.ack(msg);
           } else {
