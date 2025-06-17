@@ -220,7 +220,7 @@ async function AltaEnvio(company, data) {
             data.data.enviosDireccionesRemitente.latitud,
             data.data.enviosDireccionesRemitente.longitud,
             data.data.enviosDireccionesRemitente.obs ||
-            "observaciones light data",
+            "",
             data.data.enviosDireccionesRemitente.quien,
             company,
             connection
