@@ -26,6 +26,8 @@ class Envios {
       didCliente: data.didCliente ?? 0,
       didCuenta: data.didCuenta,
       didServicio: data.didServicio ?? 1,
+      metodo: data.metodo ?? " ",
+      didMetodoEnvio: data.didMetodoEnvio ?? 1,
       didSucursalDistribucion: data.didSucursalDistribucion ?? 1,
       peso: data.peso ?? "",
       volumen: data.volumen ?? "",
@@ -39,7 +41,7 @@ class Envios {
       destination_receiver_phone: data.destination_receiver_phone,
       destination_receiver_email: data.destination_receiver_email,
       destination_comments: data.destination_comments ?? "   ",
-      destination_type: data.destination_types ?? " ",
+      destination_types: data.destination_types ?? " ",
 
 
       delivery_preference: data.delivery_preference ?? " ",
@@ -122,7 +124,7 @@ class Envios {
       logYellow(`Insert Query: ${JSON.stringify(insertQuery)}`);
       logBlue(`Values: ${JSON.stringify(values)}`);
 
-      const result = await executeQuery(connection, insertQuery, values);
+      const result = await executeQuery(connection, insertQuery, values, true);
       const insertId = result.insertId;
 
       const updateQuery = "UPDATE envios SET did = ? WHERE id = ?";
