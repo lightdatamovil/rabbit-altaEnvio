@@ -26,7 +26,7 @@ class Envios {
       didCliente: data.didCliente ?? 0,
       didCuenta: data.didCuenta,
       didServicio: data.didServicio ?? 1,
-      metodo: data.metodo ?? " ",
+      mode: data.mode ?? " ",
       didMetodoEnvio: data.didMetodoEnvio ?? 1,
       didSucursalDistribucion: data.didSucursalDistribucion ?? 1,
       peso: data.peso ?? "",
