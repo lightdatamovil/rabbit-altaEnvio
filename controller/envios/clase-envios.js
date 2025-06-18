@@ -48,6 +48,7 @@ class Envios {
       quien: data.quien,
       elim: data.elim ?? 0,
     };
+    console.log(data.mode, "data.mode");
 
     // Solo asignar si el campo no es null
     for (const [key, value] of Object.entries(campos)) {
