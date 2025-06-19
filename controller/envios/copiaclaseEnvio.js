@@ -1,10 +1,5 @@
-
-
-const { json } = require("express");
 const { getConnection, getFromRedis, executeQuery } = require("../../dbconfig");
 const { logYellow, logBlue } = require("../../fuctions/logsCustom");
-
-
 
 class Envios {
     constructor(data, company = null, connection = null) {
@@ -14,10 +9,7 @@ class Envios {
         // Fecha de inicio ajustada
         const fecha = new Date();
         fecha.setHours(fecha.getHours() - 3); // Ajustar la hora según sea necesario
-        this.fecha_inicio = fecha.toISOString();
-        const horaActual = String(fecha.getHours()).padStart(2, "0");
-        this.horaActual = horaActual
-        this.data = data // Asignar la fecha en formato ISO
+        this.fecha_inicio = fecha.toISOString(); // Asignar la fecha en formato ISO
 
         const campos = {
             did: data.did ?? 0,
@@ -81,14 +73,13 @@ class Envios {
 
     async insert() {
         try {
-
             // Establecer elim en 52 si es necesario
             if (this.elim === "") {
                 this.elim = 52; // Cambiar a 52 si elim está vacío
             }
 
             if (this.did === 0 || this.did === "0" || this.did === "") {
-                return this.createNewRecordWithIdUpdate(this.connection,);
+                return this.createNewRecordWithIdUpdate(this.connection);
             } else {
                 return this.checkAndUpdateDid(this.connection);
             }
@@ -120,54 +111,16 @@ class Envios {
 
     async createNewRecordWithIdUpdate(connection) {
         try {
-            let hora;
-
-            const query = `
-        SELECT hora 
-        FROM clientes_cierre_ingreso 
-        WHERE superado = 0 AND elim = 0 AND didCliente = ?
-      `;
-            const result2 = await executeQuery(this.connection, query, [this.data.didCliente]);
-
-            if (result2.length > 0) {
-                hora = result2[0].hora;
-            } else {
-                const query2 = `
-          SELECT config 
-          FROM sistema_config 
-          WHERE superado = 0 AND elim = 0 
-        `;
-                const result3 = await executeQuery(this.connection, query2, []);
-                const config = JSON.parse(result3[0].config);
-                hora = config.hora_cierre;
-            }
-
-            // Calcular fecha_despacho según hora actual y hora de cierre
-            const ahora = new Date();
-            ahora.setHours(ahora.getHours() - 3); // Ajuste horario si es necesario
-
-            const horaActual = ahora.getHours(); // número 0-23
-            const horaCierre = parseInt(hora);   // también como número 0-23
-
-            const fechaDespacho = new Date(ahora);
-            if (horaActual >= horaCierre) {
-                fechaDespacho.setDate(fechaDespacho.getDate() + 1); // Sumar un día
-            }
-
-            const year = fechaDespacho.getFullYear();
-            const month = String(fechaDespacho.getMonth() + 1).padStart(2, "0");
-            const day = String(fechaDespacho.getDate()).padStart(2, "0");
-
-            this.fecha_despacho = `${year}-${month}-${day}`; // YYYY-MM-DD
-
-            // --- Insertar el nuevo registro como ya lo tenías ---
             const describeQuery = "DESCRIBE envios";
             const results = await executeQuery(connection, describeQuery, []);
+
             const columns = results.map((col) => col.Field);
             const filteredColumns = columns.filter((col) => this[col] !== undefined);
             const values = filteredColumns.map((col) => this[col]);
 
-            const insertQuery = `INSERT INTO envios (${filteredColumns.join(", ")}) VALUES (${filteredColumns.map(() => "?").join(", ")})`;
+            const insertQuery = `INSERT INTO envios (${filteredColumns.join(
+                ", "
+            )}) VALUES (${filteredColumns.map(() => "?").join(", ")})`;
 
             logYellow(`Insert Query: ${JSON.stringify(insertQuery)}`);
             logBlue(`Values: ${JSON.stringify(values)}`);
@@ -183,7 +136,6 @@ class Envios {
             throw error;
         }
     }
-
 
     async createNewRecord(connection, did) {
         try {
