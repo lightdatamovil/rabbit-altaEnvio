@@ -23,7 +23,7 @@ async function startConsumer() {
           const idEmpresa = data.data.didEmpresa;
 
           const empresasIgnoradas = new Set([149, 44, 86, 36]);
-          const empresasPermitidas = new Set([159, 214, 274, 108, 268, 201, 237, 61, 106, 198, 247, 287]);
+          const empresasPermitidas = new Set([159, 214, 274, 108, 268, 201, 237, 61, 106, 198, 247, 287, 297, 232, 105, 205, 225]);
 
 
           if (empresasIgnoradas.has(idEmpresa)) {
