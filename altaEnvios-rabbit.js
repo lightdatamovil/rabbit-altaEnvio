@@ -35,6 +35,8 @@ async function startConsumer() {
             //  const connectionDb = await getConnection(idEmpresa);
             const company = await getCompanyById(idEmpresa);
             console.log(data);
+            console.log("EMPRESAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 1700000000000000000000000000000000000000000000000");
+
 
             await AltaEnvio(company, data);
 
