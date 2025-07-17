@@ -252,7 +252,7 @@ async function AltaEnvio(company, data) {
 
         let respuesta = await sendToShipmentStateMicroService(
           company.did,
-          data.data.quien,
+          data.data.quien ?? 0,
           insertId,
           data.data.estado ?? 7
         );
