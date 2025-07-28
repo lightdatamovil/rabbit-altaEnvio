@@ -60,6 +60,9 @@ async function AltaEnvio(company, data) {
     }
     try {
       let insertId;
+      if (company.did == 97) {
+        data.data.envio = 7;
+      }
 
       if (data.data.flex === 1 && data.data.mlIa == 0) {
         const envioflex = new EnviosFlex(
