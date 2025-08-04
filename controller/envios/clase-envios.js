@@ -51,7 +51,7 @@ class Envios {
       quien: data.quien,
       elim: data.elim ?? 0,
     };
-    console.log(data.mode, "data.mode");
+
 
     // Solo asignar si el campo no es null
     for (const [key, value] of Object.entries(campos)) {
@@ -142,7 +142,7 @@ class Envios {
       ahora.setHours(ahora.getHours()); // Ajuste horario si es necesario
 
       const horaActual = ahora.getHours(); // número 0-23
-      console.log(horaActual, "horaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+
       const horaCierre = parseInt(hora);   // también como número 0-23
 
       const fechaDespacho = new Date(ahora);
@@ -168,7 +168,7 @@ class Envios {
       logYellow(`Insert Query: ${JSON.stringify(insertQuery)}`);
       logBlue(`Values: ${JSON.stringify(values)}`);
 
-      const result = await executeQuery(connection, insertQuery, values, true);
+      const result = await executeQuery(connection, insertQuery, values);
       const insertId = result.insertId;
 
       const updateQuery = "UPDATE envios SET did = ? WHERE id = ?";

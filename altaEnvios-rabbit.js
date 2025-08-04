@@ -23,8 +23,9 @@ async function startConsumer() {
           const idEmpresa = data.data.didEmpresa;
 
           const empresasIgnoradas = new Set([149, 44, 86, 36]);
-          const empresasPermitidas = new Set([159, 214, 274, 108, 268, 201, 237, 61, 106, 198, 247, 287, 297, 232, 105, 205, 225, 257, 111, 170, 160, 333, 192]);
-
+          const empresasPermitidas = new Set([159, 214, 274, 108, 268, 201, 237, 61, 106, 198, 247, 287, 297, 232, 105, 205, 225, 257, 111, 170, 160, 333, 192,
+            47, 51, 102, 115, 162, 165, 174, 177, 203, 206, 215, 229, 230, 231, 260, 278, 283, 316
+          ]);
 
           if (empresasIgnoradas.has(idEmpresa)) {
             console.log(`Mensaje con idEmpresa ${idEmpresa} ignorado.`);
@@ -35,10 +36,7 @@ async function startConsumer() {
             //  const connectionDb = await getConnection(idEmpresa);
             const company = await getCompanyById(idEmpresa);
             console.log(data);
-            if (company.did == 170) {
 
-              console.log("EMPRESAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA 1700000000000000000000000000000000000000000000000");
-            }
 
 
             await AltaEnvio(company, data);

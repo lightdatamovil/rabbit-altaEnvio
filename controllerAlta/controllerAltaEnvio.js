@@ -80,7 +80,7 @@ async function AltaEnvio(company, data) {
 
         const resultado = await envioflex.insert();
         insertId = resultado.did;
-        console.log("Registro insertado con ID:", insertId);
+        //  console.log("Registro insertado con ID:", insertId);
       } else {
         if (
           !data.data ||
@@ -93,7 +93,7 @@ async function AltaEnvio(company, data) {
 
         const email = data.data.destination_receiver_email;
         delete data.data.destination_receiver_email;
-        console.log("Todos los campos son válidos.");
+        //  console.log("Todos los campos son válidos.");
 
         if (email) {
           data.data.destination_receiver_email = email;
@@ -130,7 +130,7 @@ async function AltaEnvio(company, data) {
         const envio = new Envios(data.data, company, connection);
         const resultado = await envio.insert();
         insertId = resultado.did;
-        console.log(resultado, "resultado envio");
+        //     console.log(resultado, "resultado envio");
 
         //     console.log(envio, "envio");
         //  console.log(data.data, "data");
@@ -259,7 +259,7 @@ async function AltaEnvio(company, data) {
           insertId,
           data.data.estado ?? 7
         );
-        console.log(respuesta, "respuesta");
+        //   console.log(respuesta, "respuesta");
 
         logPurple("FINAL");
         return true;
