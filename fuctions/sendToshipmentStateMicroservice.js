@@ -44,7 +44,9 @@ async function sendToShipmentStateMicroService(companyId, userId, shipmentId, es
             estadoML: null,
             fecha: formatFechaUTC3(),
             quien: userId || 0,
-            operacion: "Altamasiva"
+            operacion: "Altamasiva",
+            desde: "aeIA"
+
         };
 
         const sent = rabbitChannel.sendToQueue(
