@@ -1,62 +1,94 @@
 const amqp = require("amqplib");
-const { getCompanyById, getConnection } = require("./dbconfig");
+const { getCompanyById } = require("./dbconfig");
 const { AltaEnvio } = require("./controllerAlta/controllerAltaEnvio");
 
+const AMQP_URL = "amqp://lightdata:QQyfVBKRbw6fBb@158.69.131.226:5672";
+const QUEUE = "insertMLIA";
+
+// Back-pressure
+const PREFETCH = 5;          // cantidad máx. de mensajes sin ACK a la vez
+const RATE_LIMIT_PER_SEC = 500; // no más de 20 procesamientos por segundo
+
+// Rate limiter simple
+class RateLimiter {
+  constructor(rps) {
+    this.capacity = rps;
+    this.tokens = rps;
+    setInterval(() => {
+      this.tokens = this.capacity;
+    }, 1000).unref();
+  }
+  async take() {
+    if (this.tokens > 0) {
+      this.tokens -= 1;
+      return;
+    }
+    await new Promise((r) => setTimeout(r, 50));
+    return this.take();
+  }
+}
+const limiter = new RateLimiter(RATE_LIMIT_PER_SEC);
+
 async function startConsumer() {
-  let connection, channel;
+  for (; ;) {
+    try {
+      console.log(`[amqp] conectando a ${AMQP_URL}`);
+      const connection = await amqp.connect(AMQP_URL, { heartbeat: 15 });
+      const channel = await connection.createChannel();
+      await channel.assertQueue(QUEUE, { durable: true });
+      await channel.prefetch(PREFETCH);
 
-  try {
-    connection = await amqp.connect(
-      "amqp://lightdata:QQyfVBKRbw6fBb@158.69.131.226:5672"
-    );
-    channel = await connection.createChannel();
+      console.log(
+        `[amqp] Esperando mensajes en ${QUEUE} (prefetch=${PREFETCH}, rps=${RATE_LIMIT_PER_SEC})`
+      );
 
-    const queue = "insertMLIA";
-    await channel.assertQueue(queue, { durable: true });
+      const empresasIgnoradas = new Set([149, 44, 86, 36]);
+      const empresasPermitidas = new Set([
+        159, 214, 274, 108, 268, 201, 237, 61, 106, 198, 247, 287, 297, 232, 105,
+        205, 225, 257, 111, 170, 160, 333, 192, 47, 51, 115, 162, 165, 174, 177,
+        203, 206, 215, 229, 230, 231, 260, 278, 283, 316, 343, 211, 124, 167, 97,
+        271, 200
+      ]);
 
-    console.log("Esperando mensajes en la cola:", queue);
+      channel.consume(
+        QUEUE,
+        async (msg) => {
+          if (!msg) return;
+          await limiter.take(); // respeta el rate-limit
 
-    channel.consume(queue, async (msg) => {
-      if (msg !== null) {
-        try {
-          const data = JSON.parse(msg.content.toString());
-          const idEmpresa = data.data.didEmpresa;
+          try {
+            const data = JSON.parse(msg.content.toString());
+            const idEmpresa = data?.data?.didEmpresa;
 
-          const empresasIgnoradas = new Set([149, 44, 86, 36]);
-          const empresasPermitidas = new Set([159, 214, 274, 108, 268, 201, 237, 61, 106, 198, 247, 287, 297, 232, 105, 205, 225, 257, 111, 170, 160, 333, 192,
-            47, 51, 115, 162, 165, 174, 177, 203, 206, 215, 229, 230, 231, 260, 278, 283, 316, 343, 211, 124, 167, 97, 271
-          ]);
+            if (empresasIgnoradas.has(idEmpresa)) {
+              console.log(`Ignorado idEmpresa=${idEmpresa}`);
+              channel.ack(msg);
+              return;
+            }
 
-          if (empresasIgnoradas.has(idEmpresa)) {
-            console.log(`Mensaje con idEmpresa ${idEmpresa} ignorado.`);
-            return channel.ack(msg);
+            if (empresasPermitidas.has(idEmpresa)) {
+              const company = await getCompanyById(idEmpresa);
+              await AltaEnvio(company, data); // tu lógica de DB
+              channel.ack(msg);
+            } else {
+              channel.ack(msg); // limpia aunque no procese
+            }
+          } catch (err) {
+            console.error("Error procesando mensaje:", err);
+            // si el error es fatal, no lo requeueamos
+            channel.nack(msg, false, false);
           }
+        },
+        { noAck: false }
+      );
 
-          if (empresasPermitidas.has(idEmpresa)) {
-            //  const connectionDb = await getConnection(idEmpresa);
-            const company = await getCompanyById(idEmpresa);
-            console.log(data);
-
-
-
-            await AltaEnvio(company, data);
-
-
-            channel.ack(msg);
-          } else {
-            // Si no es 97 ni excluida, solo confirmo sin procesar
-            channel.ack(msg);
-          }
-        } catch (error) {
-          console.error("Error procesando el mensaje:", error);
-          // Nack con reintento
-          channel.nack(msg);
-        }
-      }
-    });
-  } catch (error) {
-    console.error("Error en el consumidor de RabbitMQ:", error);
-    // Aquí no hay 'msg' para hacer nack, solo loguear el error
+      // mantener proceso vivo
+      await new Promise((resolve) => connection.once("close", resolve));
+      console.warn("[amqp] conexión cerrada, reintentando...");
+    } catch (err) {
+      console.error("[amqp] error al consumir:", err);
+      await new Promise((r) => setTimeout(r, 5000)); // espera 5s y reintenta
+    }
   }
 }
 
