@@ -18,6 +18,7 @@ const { error } = require("console");
 const sendToShipmentStateMicroService = require("../fuctions/sendToshipmentStateMicroservice");
 const { json } = require("stream/consumers");
 const { getConnection, executeQuery } = require("../dbconfig");
+const { estadoRedis } = require("../fuctions/estadoRedis");
 
 async function AltaEnvio(company, data) {
   // console.log("AltaEnvio", data, company);
@@ -60,9 +61,7 @@ async function AltaEnvio(company, data) {
     }
     try {
       let insertId;
-      /*  if (company.did == 97) {
-          data.data.envio = 7;
-        }*/
+
 
       if (data.data.flex === 1 && data.data.mlIa == 0) {
         const envioflex = new EnviosFlex(
@@ -82,12 +81,7 @@ async function AltaEnvio(company, data) {
         insertId = resultado.did;
         //  console.log("Registro insertado con ID:", insertId);
       } else {
-        if (
-          !data.data ||
-          !data.data.enviosDireccionesDestino ||
-          !data.data.enviosDireccionesDestino.calle ||
-          !data.data.enviosDireccionesDestino.cp
-        ) {
+        if (!data.data || !data.data.enviosDireccionesDestino || !data.data.enviosDireccionesDestino.calle || !data.data.enviosDireccionesDestino.cp) {
           return false;
         }
 
@@ -136,6 +130,19 @@ async function AltaEnvio(company, data) {
         //  console.log(data.data, "data");
 
         logGreen(`Registro insertado con did: ${insertId}`);
+
+        const estadoRedis = await estadoRedis(
+          company.did,
+          data.data.estado || 7,
+          data.data.did,
+          connection,
+          data.data.ml_shipment_id,
+          data.data.ml_vendedor_id
+        );
+
+
+
+
 
         // Validación y creación de EnviosCobranza
         if (data.data.envioscobranza) {
