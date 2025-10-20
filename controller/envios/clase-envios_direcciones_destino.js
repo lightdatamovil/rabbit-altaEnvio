@@ -132,7 +132,15 @@ class EnviosDireccionesDestino {
       // logYellow(`Insert Query: ${JSON.stringify(insertQuery)}`);
       //logBlue(`Values: ${JSON.stringify(values)}`);
 
+
+
+
+
+
       const insertResult = await executeQuery(connection, insertQuery, values);
+      const resultId = insertResult.insertId;
+      const queryUpdateDid = 'UPDATE envios_direcciones_destino SET did = ? WHERE id = ?';
+      await executeQuery(connection, queryUpdateDid, [resultId, resultId]);
       return { insertId: insertResult.insertId };
     } catch (error) {
       throw error;
