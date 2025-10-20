@@ -194,8 +194,7 @@ async function AltaEnvio(company, data) {
             insertId,
             data.data.enviosDireccionesDestino.calle,
             data.data.enviosDireccionesDestino.numero,
-            data.data.enviosDireccionesDestino.address_line ||
-            `${data.data.enviosDireccionesDestino.calle} " " ${data.data.enviosDireccionesDestino.numero}`,
+            data.data.enviosDireccionesDestino.calle + " " + data.data.enviosDireccionesDestino.numero,
             data.data.enviosDireccionesDestino.cp,
             data.data.enviosDireccionesDestino.ciudad,
             data.data.enviosDireccionesDestino.localidad,
