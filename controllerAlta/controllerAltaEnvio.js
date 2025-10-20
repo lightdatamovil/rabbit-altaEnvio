@@ -14,11 +14,11 @@ const {
   logPurple,
   logBlue,
 } = require("../fuctions/logsCustom");
-const { error } = require("console");
+
 const sendToShipmentStateMicroService = require("../fuctions/sendToshipmentStateMicroservice");
-const { json } = require("stream/consumers");
+
 const { getConnection, executeQuery } = require("../dbconfig");
-const { estadoRedis } = require("../fuctions/estadoRedis");
+//const { estadoRedis } = require("../fuctions/estadoRedis");
 
 async function AltaEnvio(company, data) {
   // console.log("AltaEnvio", data, company);
@@ -131,17 +131,17 @@ async function AltaEnvio(company, data) {
 
         logGreen(`Registro insertado con did: ${insertId}`);
 
-        const estadoRedis = await estadoRedis(
-          company.did,
-          data.data.estado || 7,
-          data.data.did,
-          connection,
-          data.data.ml_shipment_id,
-          data.data.ml_vendedor_id
-        );
-
-
-
+        /*  const estadoRedis = await estadoRedis(
+            company.did,
+            data.data.estado || 7,
+            data.data.did,
+            connection,
+            data.data.ml_shipment_id,
+            data.data.ml_vendedor_id
+          );
+  
+  
+  */
 
 
         // Validación y creación de EnviosCobranza
