@@ -252,7 +252,7 @@ async function AltaEnvio(company, data) {
               item.dimensions,
               item.cantidad,
               item.variacion,
-              item.seller_sku,
+              item.seller_sku ?? "",
               item.descargado ?? 0,
               item.superado ?? 0,
               item.elim ?? 0,
