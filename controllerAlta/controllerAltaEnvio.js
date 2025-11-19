@@ -239,6 +239,9 @@ async function AltaEnvio(company, data) {
 
         // Validación y creación de EnviosItems
         if (data.data.enviosItems) {
+
+          console.log(enviosItems, "iteeeeeeeeeeeeeeeeeeeeeeem");
+
           const enviosItems = new EnviosItems(
             insertId,
             data.data.enviosItems.codigo,
