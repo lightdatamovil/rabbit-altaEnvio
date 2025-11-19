@@ -238,28 +238,32 @@ async function AltaEnvio(company, data) {
         }
 
         // Validación y creación de EnviosItems
-        if (data.data.enviosItems) {
+        if (data.data.enviosItems && Array.isArray(data.data.enviosItems)) {
 
-          console.log(data.data.enviosItems, "data.data.enviosItems");
+          for (const item of data.data.enviosItems) {
+            console.log(item, "enviosItem individual");
 
-          const enviosItems = new EnviosItems(
-            insertId,
-            data.data.enviosItems.codigo,
-            data.data.enviosItems.imagen,
-            data.data.enviosItems.descripcion,
-            data.data.enviosItems.ml_id,
-            data.data.enviosItems.dimensions,
-            data.data.enviosItems.cantidad,
-            data.data.enviosItems.variacion,
-            data.data.enviosItems.seller_sku,
-            data.data.enviosItems.descargado,
+            const enviosItems = new EnviosItems(
+              insertId,
+              item.codigo,
+              item.imagen,
+              item.descripcion,
+              item.ml_id,
+              item.dimensions,
+              item.cantidad,
+              item.variacion,
+              item.seller_sku,
+              item.descargado ?? 0,
+              item.superado ?? 0,
+              item.elim ?? 0,
+              company,
+              connection
+            );
 
-            data.data.enviosItems.superado,
-            data.data.enviosItems.elim,
-            company,
-            connection
-          );
-          const insertIdItems = await enviosItems.insert(); // Asegúrate de que `insert()` esté definido en EnviosItems
+            const insertIdItems = await enviosItems.insert();
+            console.log("Item insertado:", insertIdItems);
+          }
+
         }
 
         let respuesta = await sendToShipmentStateMicroService(
